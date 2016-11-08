@@ -15,6 +15,3 @@ target/
 logs/
 *.log
 *.gz
-
-# TODO list
-/src/TODO.txt
