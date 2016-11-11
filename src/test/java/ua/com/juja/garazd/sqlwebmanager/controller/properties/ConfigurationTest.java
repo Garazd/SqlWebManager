@@ -7,13 +7,13 @@ import java.util.Properties;
 
 public class ConfigurationTest {
 
-    public static final String CONFIG_SQLCMD_PROPERTIES = "src/main/resources/sqlwebmanager.properties";
+    public static final String CONFIG_SQLWEBMANAGER_PROPERTIES = "src/main/resources/sqlwebmanager.properties";
 
     private Properties properties;
 
     public ConfigurationTest() {
         properties = new Properties();
-        File file = new File(CONFIG_SQLCMD_PROPERTIES);
+        File file = new File(CONFIG_SQLWEBMANAGER_PROPERTIES);
         try (FileInputStream fileInput = new FileInputStream(file)) {
             properties.load(fileInput);
         } catch (IOException e) {
