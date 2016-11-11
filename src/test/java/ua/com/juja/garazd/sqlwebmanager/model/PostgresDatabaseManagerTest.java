@@ -188,7 +188,7 @@ public class PostgresDatabaseManagerTest {
         Set<String> databaseNames = manager.getDatabasesName();
 
         // then
-        assertEquals("[postgres, sqlwebmanager, test]", databaseNames.toString());
+        assertEquals("[postgres, sqlcmd, sqlwebmanager, test]", databaseNames.toString());
     }
 
     @Test
