@@ -8,7 +8,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +16,10 @@ import java.util.StringJoiner;
 import java.util.TreeSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Component;
 import ua.com.juja.garazd.sqlwebmanager.controller.properties.Configuration;
 
+@Component
 public class PostgresDatabaseManager implements DatabaseManager {
 
     private static Configuration configuration = new Configuration();
@@ -203,7 +204,7 @@ public class PostgresDatabaseManager implements DatabaseManager {
 
     @Override
     public Set<String> getTableColumns(String tableName) {
-        Set<String> tables = new LinkedHashSet<>();
+        Set<String> tables = new TreeSet<>();
 
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(
@@ -223,7 +224,7 @@ public class PostgresDatabaseManager implements DatabaseManager {
     public Set<String> getDatabasesName() {
         connectDatabase("", USER_NAME, PASSWORD);
         String sqlQuery = "SELECT datname FROM pg_database WHERE datistemplate = false;";
-        Set<String> result = new LinkedHashSet<>();
+        Set<String> result = new TreeSet<>();
 
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sqlQuery)) {
