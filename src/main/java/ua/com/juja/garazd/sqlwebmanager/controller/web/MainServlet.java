@@ -26,20 +26,6 @@ public class MainServlet extends HttpServlet {
         String tableName = "tableName";
         DatabaseManager manager = (DatabaseManager) request.getSession().getAttribute("database_manager");
 
-        if (action.startsWith("/connect")) {
-            if (manager == null) {
-                request.getRequestDispatcher("connect.jsp").forward(request, response);
-            } else {
-                response.sendRedirect(response.encodeRedirectURL("menu"));
-            }
-            return;
-        }
-
-        if (manager == null) {
-            response.sendRedirect(response.encodeRedirectURL("connect"));
-            return;
-        }
-
         if (action.startsWith("/menu") || action.equals("/")) {
             request.setAttribute("items", service.commandsList());
             request.getRequestDispatcher("menu.jsp").forward(request, response);
@@ -57,7 +43,8 @@ public class MainServlet extends HttpServlet {
 
     private String getAction(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        return requestURI.substring(request.getContextPath().length(), requestURI.length());
+        String action = requestURI.substring(request.getContextPath().length(), requestURI.length());
+        return action;
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
