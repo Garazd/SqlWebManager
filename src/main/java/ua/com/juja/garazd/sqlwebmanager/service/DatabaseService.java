@@ -13,7 +13,7 @@ public class DatabaseService implements Service {
 
     @Override
     public List<String> commandsList() {
-        return Arrays.asList("help", "menu", "connect", "find");
+        return Arrays.asList("help", "menu", "connect");
     }
 
     @Override
