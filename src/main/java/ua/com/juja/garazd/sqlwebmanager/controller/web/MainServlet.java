@@ -1,23 +1,26 @@
 package ua.com.juja.garazd.sqlwebmanager.controller.web;
 
 import java.io.IOException;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import ua.com.juja.garazd.sqlwebmanager.model.DatabaseManager;
 import ua.com.juja.garazd.sqlwebmanager.service.Service;
-import ua.com.juja.garazd.sqlwebmanager.service.DatabaseService;
 
 public class MainServlet extends HttpServlet {
 
+    @Autowired
     private Service service;
 
     @Override
-    public void init() throws ServletException {
-        super.init();
-
-        service = new DatabaseService();
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this,
+            config.getServletContext());
     }
 
     @Override
@@ -56,7 +59,7 @@ public class MainServlet extends HttpServlet {
             String password = request.getParameter("password");
 
             try {
-                DatabaseManager manager = service.connect(databaseName, userName, password);
+                DatabaseManager manager = service.connectDatabase(databaseName, userName, password);
                 request.getSession().setAttribute("database_manager", manager);
                 response.sendRedirect(response.encodeRedirectURL("menu"));
             } catch (Exception e) {
