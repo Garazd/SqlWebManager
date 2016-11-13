@@ -223,7 +223,7 @@ public class PostgresDatabaseManager implements DatabaseManager {
     public Set<String> getDatabasesName() {
         connectDatabase("", USER_NAME, PASSWORD);
         String sqlQuery = "SELECT datname FROM pg_database WHERE datistemplate = false;";
-        Set<String> result = new TreeSet<>();
+        Set<String> result = new LinkedHashSet<>();
 
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sqlQuery)) {
