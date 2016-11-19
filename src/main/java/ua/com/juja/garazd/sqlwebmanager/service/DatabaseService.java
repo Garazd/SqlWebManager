@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ua.com.juja.garazd.sqlwebmanager.model.DatabaseManager;
 import ua.com.juja.garazd.sqlwebmanager.model.PostgresDatabaseManager;
@@ -11,14 +12,17 @@ import ua.com.juja.garazd.sqlwebmanager.model.PostgresDatabaseManager;
 @Component
 public class DatabaseService implements Service {
 
+    @Autowired
+    private PostgresDatabaseManager manager;
+    private String className;
+
     @Override
     public List<String> commandsList() {
-        return Arrays.asList("help", "menu", "connect");
+        return Arrays.asList("help", "menu", "connectDatabase", "clearTable");
     }
 
     @Override
-    public DatabaseManager connect(String databaseName, String userName, String password) {
-        DatabaseManager manager = new PostgresDatabaseManager();
+    public DatabaseManager connectDatabase(String databaseName, String userName, String password) {
         manager.connectDatabase(databaseName, userName, password);
         return manager;
     }
@@ -39,5 +43,9 @@ public class DatabaseService implements Service {
         }
 
         return result;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
     }
 }
