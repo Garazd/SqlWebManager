@@ -7,7 +7,7 @@ public interface Service {
 
     List<String> commandsList();
 
-    DatabaseManager connect(String databaseName, String userName, String password);
+    DatabaseManager connectDatabase(String databaseName, String userName, String password);
 
     List<List<String>> getTableData(DatabaseManager manager, String tableName);
 }
