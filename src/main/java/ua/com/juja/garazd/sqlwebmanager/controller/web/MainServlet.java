@@ -37,6 +37,8 @@ public class MainServlet extends HttpServlet {
         } else if (action.startsWith("/find")) {
             request.setAttribute("rows", service.getTableData(manager, tableName));
             request.getRequestDispatcher("find.jsp").forward(request, response);
+        } else if (action.equals("/clear")) {
+            request.getRequestDispatcher("clear.jsp").forward(request, response);
         } else if (action.startsWith("/connect")) {
             request.getRequestDispatcher("connect.jsp").forward(request, response);
         } else {
