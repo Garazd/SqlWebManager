@@ -16,38 +16,35 @@ import java.util.StringJoiner;
 import java.util.TreeSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import ua.com.juja.garazd.sqlwebmanager.controller.properties.Configuration;
 
 @Component
+@Scope("prototype")
 public class PostgresDatabaseManager implements DatabaseManager {
 
-    private static Configuration configuration = new Configuration();
-    private static String USER_NAME = configuration.getUserName();
-    private static String PASSWORD = configuration.getPassword();
+    private static String JDBC_POSTGRESQL_URL = "jdbc:postgresql://localhost:5432/";
+    private static String DRIVER = "org.postgresql.Driver";
+    private static String USER_NAME = "postgres";
+    private static String PASSWORD = "postgres";
     private static Logger logger = LogManager.getLogger(PostgresDatabaseManager.class.getName());
     private Connection connection;
 
-    static {
+    @Override
+    public void connectDatabase(String database, String user, String password) {
         try {
-            Class.forName(configuration.getClassDriver());
+            Class.forName(DRIVER);
         } catch (ClassNotFoundException e) {
             System.out.println("Please load database driver to project.");
             logger.debug("Error in the load load database driver to project " + e);
             throw new DatabaseManagerException("Error in the load load database driver to project ", e);
         }
-    }
 
-    @Override
-    public void connectDatabase(String databaseName, String userName, String password) {
         try {
-            String databaseUrl = String.format("%s%s:%s/%s",
-                configuration.getJdbcDriver(),
-                configuration.getServerName(),
-                configuration.getPortNumber(),
-                configuration.getDatabaseName());
-            connection = DriverManager.getConnection(databaseUrl, USER_NAME, PASSWORD);
-        } catch (Exception e) {
+            connection = DriverManager.getConnection(
+                JDBC_POSTGRESQL_URL + database + "", "" + user + "",
+                "" + password + "");
+        } catch (SQLException e) {
             connection = null;
             logger.debug("Error in the method connectionDatabase do not correct values in the file configuration " + e);
             throw new DatabaseManagerException("Please enter the correct values in the file configuration.", e);
@@ -129,7 +126,6 @@ public class PostgresDatabaseManager implements DatabaseManager {
             throw new DatabaseManagerException("Error in the method createEntry ", e);
         }
     }
-
 
     @Override
     public void updateTable(String tableName, int id, Map<String, Object> newValue) {
