@@ -17,5 +17,6 @@
                 </tr>
             </c:forEach>
         </table>
+        <tr><td><b>To menu <a href="menu">menu</a></b></td></tr>
     </body>
 </html>
