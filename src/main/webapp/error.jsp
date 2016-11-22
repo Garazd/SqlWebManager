@@ -5,6 +5,6 @@
     </head>
     <body>
         Something went wrong: ${message}<br>
-        <a href="menu">menu</a><br>
+        <tr><td><b>To menu <a href="menu">menu</a></b></td></tr>
     </body>
 </html>
