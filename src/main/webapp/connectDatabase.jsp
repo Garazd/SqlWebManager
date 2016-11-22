@@ -1,10 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <html>
     <head>
-        <title>SQLCmd</title>
+        <title>SQLWebManager</title>
     </head>
     <body>
-        <form action="connect" method="post">
+        <form action="connectDatabase" method="post">
             <table>
                 <tr>
                     <td>Database name</td>
@@ -20,7 +20,7 @@
                 </tr>
                 <tr>
                     <td></td>
-                    <td><input type="submit" value="connect"/></td>
+                    <td><input type="submit" value="connectDatabase"/></td>
                 </tr>
             </table>
         </form>
