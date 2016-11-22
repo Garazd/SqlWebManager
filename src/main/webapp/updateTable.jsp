@@ -5,7 +5,7 @@
         <title>SQLWebManager</title>
     </head>
     <body>
-        <form action="update" method="post">
+        <form action="updateTable" method="post">
             <table>
                 <input type="hidden" name="columnCount" value="${columnCount}" />
                 <input type="hidden" name="tableName" value="${tableName}" />
@@ -29,7 +29,7 @@
 
                 <tr>
                     <td></td>
-                    <td><input type="submit" value="update"/></td>
+                    <td><input type="submit" value="updateTable"/></td>
                 </tr>
             </table>
         </form>
