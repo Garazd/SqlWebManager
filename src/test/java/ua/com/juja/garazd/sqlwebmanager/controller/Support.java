@@ -1,4 +1,4 @@
-package ua.com.juja.garazd.sqlwebmanager.controller.properties;
+package ua.com.juja.garazd.sqlwebmanager.controller;
 
 import ua.com.juja.garazd.sqlwebmanager.model.DatabaseManager;
 

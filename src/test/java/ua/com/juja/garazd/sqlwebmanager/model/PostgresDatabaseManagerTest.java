@@ -7,8 +7,8 @@ import java.util.Set;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ua.com.juja.garazd.sqlwebmanager.controller.properties.ConfigurationTest;
-import ua.com.juja.garazd.sqlwebmanager.controller.properties.Support;
+import ua.com.juja.garazd.sqlwebmanager.controller.ConfigurationTest;
+import ua.com.juja.garazd.sqlwebmanager.controller.Support;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

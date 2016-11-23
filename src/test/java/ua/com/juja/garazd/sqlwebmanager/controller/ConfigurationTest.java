@@ -1,4 +1,4 @@
-package ua.com.juja.garazd.sqlwebmanager.controller.properties;
+package ua.com.juja.garazd.sqlwebmanager.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
