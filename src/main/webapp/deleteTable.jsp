@@ -4,7 +4,7 @@
         <title>SQLWebManager</title>
     </head>
     <body>
-        <form action="delete" method="post">
+        <form action="deleteTable" method="post">
             <table>
                 <tr>
                     <td>Table name</td>
@@ -23,7 +23,7 @@
 
                 <tr>
                     <td></td>
-                    <td><input type="submit" value="delete"/></td>
+                    <td><input type="submit" value="deleteTable"/></td>
                 </tr>
             </table>
         </form>
