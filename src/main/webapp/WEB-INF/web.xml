@@ -24,7 +24,7 @@
 
     <servlet>
         <servlet-name>MainServlet</servlet-name>
-        <servlet-class>ua.com.juja.garazd.sqlwebmanager.controller.web.MainServlet</servlet-class>
+        <servlet-class>ua.com.juja.garazd.sqlwebmanager.controller.MainServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
