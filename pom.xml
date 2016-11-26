@@ -146,6 +146,8 @@
                     <webApp>
                         <contextPath>/SqlWebManager</contextPath>
                     </webApp>
+                    <stopPort>9999</stopPort>
+                    <stopKey>foo</stopKey>
                 </configuration>
             </plugin>
         </plugins>
