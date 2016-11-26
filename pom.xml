@@ -22,7 +22,7 @@
         <mockito.version>1.10.19</mockito.version>
         <servlet.version>3.1.0</servlet.version>
         <log4j2.version>2.6.2</log4j2.version>
-        <table.format.vercion>1.0</table.format.vercion>
+        <jetty.version>8.1.3.v20120416</jetty.version>
     </properties>
 
     <dependencies>
@@ -38,19 +38,43 @@
             <artifactId>spring-web</artifactId>
             <version>${springframework.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+
+        <!-- Jetty -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-client</artifactId>
+            <version>${jetty.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jetty.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+            <version>${jetty.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-jsp</artifactId>
+            <version>${jetty.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Database -->
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
-        </dependency>
-
-        <!-- Table formatter -->
-        <dependency>
-            <groupId>org.ow2.sirocco</groupId>
-            <artifactId>sirocco-text-table-formatter</artifactId>
-            <version>${table.format.vercion}</version>
         </dependency>
 
         <!-- Servlet -->
@@ -92,6 +116,12 @@
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>2.26.0</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
@@ -107,13 +137,15 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+
             <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>2.2</version>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jetty.version}</version>
                 <configuration>
-                    <port>8080</port>
-                    <path>/sqlwebmanager</path>
+                    <webApp>
+                        <contextPath>/SqlWebManager</contextPath>
+                    </webApp>
                 </configuration>
             </plugin>
         </plugins>
