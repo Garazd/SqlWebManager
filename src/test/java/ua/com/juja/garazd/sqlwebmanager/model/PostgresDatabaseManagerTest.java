@@ -89,10 +89,10 @@ public class PostgresDatabaseManagerTest {
         input.put("id", 5);
         manager.createEntry(USERS_TABLE, input);
         //when
-        Map<String, Object> newValue = new LinkedHashMap<>();
+        Map<String, String> newValue = new LinkedHashMap<>();
         newValue.put("name", "Eva");
         newValue.put("password", "password");
-        manager.updateTable(USERS_TABLE, 5, newValue);
+        manager.updateTable(USERS_TABLE, "id", "5", newValue);
         //then
         List<Map<String, Object>> users = manager.getTableData(USERS_TABLE);
         assertEquals(1, users.size());
