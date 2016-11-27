@@ -10,8 +10,8 @@
     <context:annotation-config/>
     <context:component-scan base-package="ua.com.juja.garazd.sqlwebmanager"/>
 
-    <bean id="servise" class="ua.com.juja.garazd.sqlwebmanager.service.DatabaseService">
-        <property name="className" value="ua.com.juja.garazd.sqlwebmanager.model.PostgresDatabaseManager"/>
+    <bean id="servise" class="ua.com.juja.garazd.sqlwebmanager.service.DatabaseService" abstract="true">
+        <property name="getDatabaseManager" value="ua.com.juja.garazd.sqlwebmanager.model.PostgresDatabaseManager"/>
     </bean>
 
 </beans>
