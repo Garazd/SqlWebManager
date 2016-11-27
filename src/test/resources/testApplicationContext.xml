@@ -13,7 +13,7 @@
     <bean id="InMemoryDatabaseManager" class="ua.com.juja.garazd.sqlwebmanager.model.InMemoryDatabaseManager"/>
 
     <bean id="service" class="ua.com.juja.garazd.sqlwebmanager.service.DatabaseService">
-        <lookup-method name="getManager" bean="InMemoryDatabaseManager"/>
+        <lookup-method name="getDatabaseManager" bean="InMemoryDatabaseManager"/>
     </bean>
 
 </beans>
