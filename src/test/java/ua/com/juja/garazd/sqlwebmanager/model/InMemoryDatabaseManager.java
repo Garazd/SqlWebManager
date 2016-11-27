@@ -23,6 +23,11 @@ public class InMemoryDatabaseManager implements DatabaseManager {
     }
 
     @Override
+    public String getPrimaryKey(String table) {
+        return null;
+    }
+
+    @Override
     public void connectDatabase(String database, String userName, String password) {
         // do nothing
     }
@@ -45,7 +50,7 @@ public class InMemoryDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public void updateTable(String tableName, int id, Map<String, Object> newValue) {
+    public void updateTable(String tableName, String primaryKeyName, String primaryKeyValue, Map<String, String> newValue) {
         // do nothing
     }
 
