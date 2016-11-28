@@ -1,6 +1,7 @@
 package ua.com.juja.garazd.sqlwebmanager.model;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,16 +9,18 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.TreeSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Scope;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 @Scope("prototype")
@@ -28,6 +31,7 @@ public class PostgresDatabaseManager implements DatabaseManager {
     private static String USER_NAME = "postgres";
     private static String PASSWORD = "postgres";
     private static Logger logger = LogManager.getLogger(PostgresDatabaseManager.class.getName());
+    private JdbcTemplate template;
     private Connection connection;
 
     @Override
@@ -92,12 +96,7 @@ public class PostgresDatabaseManager implements DatabaseManager {
 
     @Override
     public void createTable(String query) {
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + query);
-        } catch (SQLException e) {
-            logger.debug("Error in the method createTable " + e);
-            throw new DatabaseManagerException("Error in the method createTable ", e);
-        }
+        template.execute(String.format("CREATE TABLE IF NOT EXISTS %s", query));
     }
 
     @Override
@@ -111,16 +110,10 @@ public class PostgresDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public void createEntry(String tableName, Map<String, Object> input) {
-        StringJoiner tableNames = new StringJoiner(",");
-        StringJoiner values = new StringJoiner("','", "'", "'");
-
+    public void createEntry(String tableName, Map<String, Object> columnData) {
         try (Statement statement = connection.createStatement()) {
-            for (Map.Entry<String, Object> entry : input.entrySet()) {
-                tableNames.add(entry.getKey());
-                values.add(entry.getValue().toString());
-            }
-            statement.executeUpdate(String.format("INSERT INTO public.%s (%s)VALUES (%s)", tableName, tableNames, values));
+            statement.executeUpdate("INSERT INTO " + tableName + " (" + getColumnNames(columnData) + ")" +
+                " VALUES (" + getColumnValues(columnData) + ")");
         } catch (SQLException e) {
             logger.debug("Error in the method createEntry " + e);
             throw new DatabaseManagerException("Error in the method createEntry ", e);
@@ -128,92 +121,74 @@ public class PostgresDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public void updateTable(String tableName, int id, Map<String, Object> newValue) {
-        StringJoiner tableNames = new StringJoiner(" = ?,", "", " = ?");
-        newValue.entrySet().forEach(x -> tableNames.add(x.getKey()));
+    public void updateTable(String table, String primaryKeyName, String primaryKeyValue, Map<String, String> newValue) {
+        String columns = StringUtils.collectionToDelimitedString(newValue.keySet(), ",", "\"", "\" = ?");
 
-        String sqlUpdate = String.format("UPDATE public.%s SET %s WHERE id = ?", tableName, tableNames);
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sqlUpdate)) {
-            int index = 1;
-            for (Object value : newValue.values()) {
-                preparedStatement.setObject(index, value);
-                index++;
-            }
-            preparedStatement.setInt(index, id);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            logger.debug("Error in the method updateTable " + e);
-            throw new DatabaseManagerException("Error in the method updateTable ", e);
-        }
+        template.update(String.format("UPDATE %s SET %s WHERE %s = %s",
+            table, columns, primaryKeyName, primaryKeyValue), newValue.values().toArray());
     }
 
     @Override
-    public void clearTable(String tableName) {
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("DELETE FROM public." + tableName);
-        } catch (SQLException e) {
-            logger.debug("Error in the method clearTable " + e);
-            throw new DatabaseManagerException("Error in the method clearTable ", e);
-        }
+    public void clearTable(String table) {
+        template.update(String.format("DELETE FROM %s", table));
     }
 
     @Override
     public Set<String> getTableNames() {
-        Set<String> tables = new TreeSet<>();
-
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery
-                 ("SELECT table_name FROM information_schema.tables " +
-                     "WHERE table_schema='public' AND table_type = 'BASE TABLE'")) {
-            while (resultSet.next()) {
-                tables.add(resultSet.getString("table_name"));
-            }
-            return tables;
-        } catch (SQLException e) {
-            logger.debug("Error in the method getTableNames " + e);
-            throw new DatabaseManagerException("Error in the method getTableNames ", e);
-        }
-    }
-
-    @Override
-    public List<Map<String, Object>> getTableData(String tableName) {
-        List<Map<String, Object>> result = new LinkedList<>();
-
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM public." + tableName)) {
-            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-
-            while (resultSet.next()) {
-                Map<String, Object> data = new LinkedHashMap<>();
-                for (int index = 1; index <= resultSetMetaData.getColumnCount(); index++) {
-                    data.put(resultSetMetaData.getColumnName(index), resultSet.getObject(index));
+        List<String> result = template.query("SELECT table_name FROM information_schema.tables " +
+                "WHERE table_schema='public' AND table_type='BASE TABLE'",
+            new RowMapper<String>() {
+                @Override
+                public String mapRow(ResultSet resultSet, int i) throws SQLException {
+                    return resultSet.getString("table_name");
                 }
-                result.add(data);
+            });
+        return new LinkedHashSet<>(result);
+    }
+
+    @Override
+    public String getPrimaryKey(String table) {
+        try {
+            DatabaseMetaData meta = connection.getMetaData();
+            ResultSet resultSet = meta.getPrimaryKeys(null, null, table);
+            while (resultSet.next()) {
+                return resultSet.getString("COLUMN_NAME");
             }
-            return result;
+            return null;
         } catch (SQLException e) {
-            logger.debug("Error in the method getTableData " + e);
-            throw new DatabaseManagerException("Error in the method getTableData ", e);
+            logger.debug("Error in the method getPrimaryKey " + e);
+            throw new DatabaseManagerException("Error in the method getPrimaryKey ", e);
         }
     }
 
     @Override
-    public Set<String> getTableColumns(String tableName) {
-        Set<String> tables = new TreeSet<>();
+    public List<Map<String, Object>> getTableData(String table) {
+        return template.query("SELECT * FROM " + table,
+            new RowMapper<Map<String, Object>>() {
+                @Override
+                public Map<String, Object> mapRow(ResultSet resultSet, int i) throws SQLException {
+                    ResultSetMetaData rsmd = resultSet.getMetaData();
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    for (int index = 0; index < rsmd.getColumnCount(); index++) {
+                        result.put(rsmd.getColumnName(index + 1), resultSet.getObject(index + 1));
+                    }
+                    return result;
+                }
+            });
+    }
 
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(
-                 "SELECT * FROM information_schema.columns " +
-                     "WHERE table_schema = 'public' AND table_name = '" + tableName + "'")) {
-            while (resultSet.next()) {
-                tables.add(resultSet.getString("column_name"));
-            }
-            return tables;
-        } catch (SQLException e) {
-            logger.debug("Error in the method getTableColumns " + e);
-            throw new DatabaseManagerException("Error in the method getTableColumns ", e);
-        }
+    @Override
+    public Set<String> getTableColumns(String table) {
+        List<String> result = template.query("SELECT * FROM information_schema.columns " +
+                "WHERE table_schema = 'public' AND table_name = ?",
+            new Object[] {table},
+            new RowMapper<String>() {
+                @Override
+                public String mapRow(ResultSet resultSet, int i) throws SQLException {
+                    return resultSet.getString("column_name");
+                }
+            });
+        return new LinkedHashSet<>(result);
     }
 
     @Override
@@ -244,5 +219,21 @@ public class PostgresDatabaseManager implements DatabaseManager {
             logger.debug("Error in the method getDatabasesNames " + e);
             throw new DatabaseManagerException("Error in the method getDatabasesNames ", e);
         }
+    }
+
+    private String getColumnNames(Map<String, Object> columnData) {
+        String keys = "";
+        for (Map.Entry<String, Object> pair : columnData.entrySet()) {
+            keys += pair.getKey() + ", ";
+        }
+        return keys.substring(0, keys.length() - 2);
+    }
+
+    private String getColumnValues(Map<String, Object> columnData) {
+        String values = "";
+        for (Map.Entry<String, Object> pair : columnData.entrySet()) {
+            values += "'" + pair.getValue() + "', ";
+        }
+        return values.substring(0, values.length() - 2);
     }
 }
