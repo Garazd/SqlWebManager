@@ -161,7 +161,6 @@ public class MainServlet extends HttpServlet {
         HttpServletResponse response) throws Exception {
         String tableName = request.getParameter("tableName");
         int columnCount = Integer.parseInt(request.getParameter("columnCount"));
-        String keyName = request.getParameter("keyName");
 
         Map<String, Object> columnParameters = new HashMap<>();
         for (int index = 0; index < columnCount; index++) {
@@ -170,14 +169,14 @@ public class MainServlet extends HttpServlet {
                 request.getParameter("columnType" + jindex));
         }
 
-        manager.table(tableName, keyName, columnParameters);
+        manager.createEntry(tableName, columnParameters);
         jsp("success", request, response);
     }
 
     private void updateTable(DatabaseManager manager, HttpServletRequest request,
         HttpServletResponse response) throws Exception {
         String tableName = request.getParameter("tableName");
-        Map<String, Object> data = new HashMap<>();
+        Map<String, String> data = new HashMap<>();
 
         for (int index = 1; index < getColumnCount(manager, tableName); index++) {
             data.put(request.getParameter("columnName" + index),
@@ -215,17 +214,15 @@ public class MainServlet extends HttpServlet {
             data.put(request.getParameter("columnName" + index),
                 request.getParameter("columnValue" + index));
         }
-        manager.create(tableName, data);
+        manager.createEntry(tableName, data);
         jsp("success", request, response);
     }
 
     private void deleteTable(DatabaseManager manager, HttpServletRequest request,
         HttpServletResponse response) throws Exception {
         String tableName = request.getParameter("tableName");
-        String keyName = request.getParameter("keyName");
-        String keyValue = request.getParameter("keyValue");
 
-        manager.dropTable(tableName, keyName, keyValue);
+        manager.dropTable(tableName);
         jsp("success", request, response);
     }
 
@@ -247,20 +244,20 @@ public class MainServlet extends HttpServlet {
         HttpServletResponse response) throws Exception {
         String tableName = request.getParameter("tableName");
 
-        List<String> tableData = manager.getTableData(tableName);
+        List<Map<String, Object>> tableData = manager.getTableData(tableName);
 
         request.setAttribute("table", getLists(tableData));
 
         jsp("find", request, response);
     }
 
-    private List<List<String>> getLists(List<String> tableData) {
+    private List<List<String>> getLists(List<Map<String, Object>> tableData) {
         List<List<String>> table = new ArrayList<>(tableData.size() - 1);
-        int columnCount = Integer.parseInt(tableData.get(0));
+        int columnCount = Integer.parseInt(String.valueOf(tableData.get(0)));
         for (int current = 1; current < tableData.size(); ) {
             List<String> row = new ArrayList<>(columnCount);
             for (int rowIndex = 0; rowIndex < columnCount; rowIndex++) {
-                row.add(tableData.get(current++));
+                row.add(String.valueOf(tableData.get(current++)));
             }
             table.add(row);
         }
