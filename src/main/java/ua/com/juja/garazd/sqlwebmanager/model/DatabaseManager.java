@@ -21,16 +21,18 @@ public interface DatabaseManager {
 
     void dropTable(String tableName);
 
-    void createEntry(String tableName, Map<String, Object> input);
+    void createEntry(String tableName, Map<String, Object> columnData);
 
     void clearTable(String tableName);
 
-    void updateTable(String tableName, int id, Map<String, Object> newValue);
+    void updateTable(String tableName, String primaryKeyName, String primaryKeyValue, Map<String, String> newValue);
 
 
     List<Map<String, Object>> getTableData(String tableName);
 
     Set<String> getTableNames();
+
+    String getPrimaryKey(String table);
 
     Set<String> getTableColumns(String tableName);
 
